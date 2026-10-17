@@ -1,0 +1,26 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and sensitive configuration
+.env
+.env.local
+.env.*.local
+
+# Local uploads folder (keep the directory but ignore uploaded student files)
+uploads/*
+!uploads/.gitkeep
+
+# Local data (persist locally, avoid committing personal student data)
+data/submissions.json
+!data/assignments.json
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Logs and runtime data
+logs/
+*.log

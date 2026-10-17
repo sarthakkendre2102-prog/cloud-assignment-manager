@@ -1,0 +1,28 @@
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>CLOUD ASSIGNMENT MANAGER</strong>
+        <span>A Cloud Computing Academic Demonstration Project</span>
+        <span style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.2rem;">
+          Designed for Node.js, Express, Amazon S3, AWS EC2, and Amazon CloudWatch
+        </span>
+      </div>
+      <div class="footer-tags">
+        <span class="badge badge-local">Node.js <%= process.version %></span>
+        <span class="badge badge-subject">Multer 5MB Limit</span>
+        <% if (storageMode === 's3') { %>
+          <span class="badge badge-s3">Amazon S3 Active</span>
+        <% } else { %>
+          <span class="badge badge-local">Local Storage Mode</span>
+        <% } %>
+        <span class="badge badge-active">Helmet Security Active</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

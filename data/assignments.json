@@ -1,0 +1,57 @@
+[
+  {
+    "id": "ASG-101",
+    "title": "Scalable Cloud Architecture on AWS EC2 & S3",
+    "subject": "Cloud Computing",
+    "code": "CS-401",
+    "description": "Design and document a high-availability cloud architecture deploying Node.js apps on EC2, storing student artifacts in Amazon S3, and applying IAM least-privilege roles.",
+    "dueDate": "2026-11-15",
+    "status": "Active",
+    "points": 100,
+    "faculty": "Prof. Alan Mitchell"
+  },
+  {
+    "id": "ASG-102",
+    "title": "ER Modeling & Relational Schema Normalization",
+    "subject": "Database Management Systems (DBMS)",
+    "code": "CS-302",
+    "description": "Construct an Enhanced Entity-Relationship (EER) diagram for a multi-campus university database and normalize the resulting relational schema up to Boyce-Codd Normal Form (BCNF).",
+    "dueDate": "2026-11-18",
+    "status": "Active",
+    "points": 100,
+    "faculty": "Dr. Sarah Chen"
+  },
+  {
+    "id": "ASG-103",
+    "title": "A* Pathfinding & Heuristic Optimization",
+    "subject": "Artificial Intelligence",
+    "code": "CS-405",
+    "description": "Implement the A* search algorithm for autonomous robotic obstacle traversal. Compare Manhattan versus Euclidean heuristics under sparse and dense obstacles.",
+    "dueDate": "2026-11-22",
+    "status": "Active",
+    "points": 100,
+    "faculty": "Dr. Rajesh Kumar"
+  },
+  {
+    "id": "ASG-104",
+    "title": "Wireshark Packet Analysis & TCP Congestion Control",
+    "subject": "Computer Networks",
+    "code": "CS-304",
+    "description": "Capture 3-way handshakes, simulate high latency network conditions, and document packet retransmission behaviors using Wireshark trace logs.",
+    "dueDate": "2026-11-28",
+    "status": "Active",
+    "points": 100,
+    "faculty": "Prof. David Miller"
+  },
+  {
+    "id": "ASG-105",
+    "title": "Multi-threaded Scheduler & Banker's Algorithm",
+    "subject": "Operating Systems",
+    "code": "CS-301",
+    "description": "Build a multi-core scheduler simulation testing preemptive priority scheduling and implement Dijkstra's Banker's algorithm for deadlock avoidance.",
+    "dueDate": "2026-10-10",
+    "status": "Closed",
+    "points": 100,
+    "faculty": "Dr. Elena Vance"
+  }
+]

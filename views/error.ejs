@@ -1,0 +1,29 @@
+<%- include('partials/header', { title: title || 'Error', activePage: '', storageMode: storageMode || 'local', s3Bucket: s3Bucket || '', success: null, error: null }) %>
+
+<div style="max-width: 650px; margin: 3rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem;">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem;">
+      <%= typeof statusCode !== 'undefined' && statusCode === 404 ? '🔍' : '⚠️' %>
+    </div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: #1e3a8a; margin-bottom: 0.75rem;">
+      <%= typeof statusCode !== 'undefined' ? statusCode + ' - ' : '' %><%= title || 'Notice' %>
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.6;">
+      <%= message || 'An unexpected event occurred while processing your request.' %>
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <a href="/" class="btn btn-primary">
+        <span>🏠</span> Return to Dashboard
+      </a>
+      <a href="/assignments" class="btn btn-secondary">
+        <span>📚</span> View Assignments
+      </a>
+      <a href="/files" class="btn btn-secondary">
+        <span>📁</span> View Files
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer', { storageMode: storageMode || 'local' }) %>

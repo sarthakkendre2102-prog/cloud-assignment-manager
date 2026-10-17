@@ -1,0 +1,135 @@
+<%- include('partials/header', { title: 'Submitted Files', activePage: 'files', storageMode: storageMode, s3Bucket: s3Bucket, success: success, error: error }) %>
+
+<!-- Page Title & Header -->
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 class="page-title">Submitted Assignment Files</h1>
+    <p class="page-subtitle">Repository of student submissions stored in <%= storageMode === 's3' ? 'Amazon S3 private bucket' : 'local file repository' %></p>
+  </div>
+  <div>
+    <a href="/upload" class="btn btn-primary">
+      <span>📤</span> Upload New Assignment
+    </a>
+  </div>
+</div>
+
+<!-- Storage and Search Summary Bar -->
+<div class="filter-bar">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      id="filesTableSearch" 
+      class="search-input" 
+      placeholder="Search by student, roll number, file name, subject..."
+    >
+  </div>
+
+  <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.88rem; color: var(--text-muted);">
+    <span><strong>Total Submissions:</strong> <%= files.length %></span>
+    <span>&bull;</span>
+    <span><strong>Total Size:</strong> <%= totalFormattedSize %></span>
+  </div>
+</div>
+
+<!-- Files Table Container -->
+<div class="table-container">
+  <table class="custom-table" id="filesTable">
+    <thead>
+      <tr>
+        <th style="width: 50px;">#</th>
+        <th>File Name</th>
+        <th>Student</th>
+        <th>Subject & Assignment</th>
+        <th>Upload Date</th>
+        <th>File Size</th>
+        <th>Storage</th>
+        <th style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (files.length === 0) { %>
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <div class="empty-title">No Uploaded Files Found</div>
+              <p class="empty-desc">No assignment files have been submitted yet. Upload a submission to view it here.</p>
+              <a href="/upload" class="btn btn-primary btn-sm">Upload Assignment</a>
+            </div>
+          </td>
+        </tr>
+      <% } else { %>
+        <% files.forEach(function(file, index) { %>
+          <tr>
+            <td style="color: var(--text-muted); font-weight: 600;"><%= index + 1 %></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.25rem;">
+                  <% if (file.originalFilename.endsWith('.pdf')) { %> 📕 
+                  <% } else if (file.originalFilename.endsWith('.zip')) { %> 🗜️ 
+                  <% } else { %> 📄 <% } %>
+                </span>
+                <div>
+                  <div style="font-weight: 700; color: #1e3a8a;"><%= file.originalFilename %></div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                    ID: <%= file.id %>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <strong><%= file.studentName %></strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);"><%= file.rollNumber %></div>
+            </td>
+            <td>
+              <span class="badge badge-subject" style="margin-bottom: 0.2rem;"><%= file.subject %></span>
+              <div style="font-size: 0.82rem; color: var(--text-main); font-weight: 500;">
+                <%= file.assignmentTitle %>
+              </div>
+            </td>
+            <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+              <%= new Date(file.uploadedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %>
+            </td>
+            <td style="font-size: 0.85rem; font-weight: 600; white-space: nowrap;">
+              <%= file.formattedSize %>
+            </td>
+            <td>
+              <% if (file.storageMode === 's3') { %>
+                <span class="badge badge-s3" title="Amazon S3 Object Key: <%= file.s3Key %>">
+                  ☁️ S3 Cloud
+                </span>
+              <% } else { %>
+                <span class="badge badge-local" title="Local file in uploads/">
+                  💾 Local Disk
+                </span>
+              <% } %>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <a 
+                href="/files/download/<%= file.id %>" 
+                class="btn btn-download btn-sm"
+                title="Download <%= file.originalFilename %>"
+              >
+                <span>⬇️</span> Download
+              </a>
+            </td>
+          </tr>
+        <% }); %>
+
+        <!-- Row shown dynamically by search when zero matches -->
+        <tr id="noMatchesRow" style="display: none;">
+          <td colspan="8">
+            <div class="empty-state" style="padding: 2rem 1rem;">
+              <div class="empty-icon">🔍</div>
+              <div class="empty-title">No Matching Submissions</div>
+              <p class="empty-desc">No files match your search criteria. Try a different query.</p>
+            </div>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer', { storageMode: storageMode }) %>

@@ -1,0 +1,142 @@
+<%- include('partials/header', { title: 'Assignments', activePage: 'assignments', storageMode: storageMode, s3Bucket: s3Bucket, success: success, error: error }) %>
+
+<!-- Page Title & Header -->
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 class="page-title">Course Assignments</h1>
+    <p class="page-subtitle">View active and archived coursework for all enrolled computer science subjects</p>
+  </div>
+  <a href="/upload" class="btn btn-primary">
+    <span>📤</span> Submit Assignment
+  </a>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="filter-bar">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="assignmentSearch" class="search-input" placeholder="Search by title, subject, faculty...">
+  </div>
+
+  <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+    <label for="subjectFilter" style="font-size: 0.88rem; font-weight: 600; color: var(--text-muted);">Subject:</label>
+    <select id="subjectFilter" class="form-select" style="width: auto; padding: 0.5rem 0.8rem; font-size: 0.88rem;">
+      <option value="">All Subjects</option>
+      <% subjects.forEach(function(sub) { %>
+        <option value="<%= sub %>"><%= sub %></option>
+      <% }); %>
+    </select>
+  </div>
+</div>
+
+<!-- Assignments Grid -->
+<div class="assignment-grid" id="assignmentGrid">
+  <% assignments.forEach(function(asg) { %>
+    <div class="card assignment-card" data-subject="<%= asg.subject %>">
+      <div>
+        <div class="assignment-header">
+          <span class="badge badge-subject"><%= asg.subject %></span>
+          <% if (asg.status === 'Active') { %>
+            <span class="badge badge-active">Active</span>
+          <% } else { %>
+            <span class="badge badge-closed">Closed</span>
+          <% } %>
+        </div>
+
+        <h2 class="assignment-title"><%= asg.title %></h2>
+        <p class="assignment-desc"><%= asg.description %></p>
+      </div>
+
+      <div>
+        <div class="assignment-meta">
+          <div class="meta-item">
+            <span>📅</span>
+            <strong>Due Date:</strong> <%= asg.dueDate %>
+          </div>
+          <div class="meta-item">
+            <span>👨‍🏫</span>
+            <strong>Faculty:</strong> <%= asg.faculty %>
+          </div>
+          <div class="meta-item">
+            <span>🎯</span>
+            <strong>Max Points:</strong> <%= asg.points %> pts
+          </div>
+        </div>
+
+        <div class="assignment-actions">
+          <button
+            type="button"
+            class="btn btn-secondary btn-sm btn-block view-details-btn"
+            data-id="<%= asg.id %>"
+            data-title="<%= asg.title %>"
+            data-subject="<%= asg.subject %>"
+            data-due="<%= asg.dueDate %>"
+            data-faculty="<%= asg.faculty %>"
+            data-points="<%= asg.points %>"
+            data-desc="<%= asg.description %>"
+          >
+            🔍 Details
+          </button>
+
+          <% if (asg.status === 'Active') { %>
+            <a
+              href="/upload?subject=<%= encodeURIComponent(asg.subject) %>&assignmentTitle=<%= encodeURIComponent(asg.title) %>"
+              class="btn btn-primary btn-sm btn-block"
+            >
+              Submit →
+            </a>
+          <% } else { %>
+            <button class="btn btn-secondary btn-sm btn-block" disabled style="opacity: 0.5; cursor: not-allowed;">
+              Submissions Closed
+            </button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<!-- Empty search state -->
+<div id="assignmentsEmptyState" class="empty-state" style="display: none; background: #fff; border-radius: var(--radius-lg); margin-top: 1.5rem; border: 1px solid var(--border-color);">
+  <div class="empty-icon">🔎</div>
+  <div class="empty-title">No Assignments Found</div>
+  <p class="empty-desc">No course assignments match your search or filter criteria. Try clearing the filter.</p>
+</div>
+
+<!-- Assignment Details Modal -->
+<div class="modal-overlay" id="assignmentModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Assignment Details</h3>
+      <button type="button" class="modal-close modal-close-trigger" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <span class="badge badge-subject" id="modalSubject">Subject</span>
+        <span class="badge badge-active" id="modalPoints">100 pts</span>
+      </div>
+
+      <div style="background-color: #f8fafc; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+          <strong>Due Date:</strong> <span id="modalDueDate"></span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          <strong>Course Instructor:</strong> <span id="modalFaculty"></span>
+        </div>
+      </div>
+
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">Assignment Overview & Guidelines:</h4>
+      <p id="modalDesc" style="color: var(--text-main); font-size: 0.92rem; line-height: 1.6;"></p>
+
+      <div style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
+        <strong>Allowed Formats:</strong> PDF, DOC, DOCX, ZIP &bull; <strong>Max File Size:</strong> 5 MB
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary modal-close-trigger">Close</button>
+      <a href="#" id="modalSubmitBtn" class="btn btn-primary">Proceed to Submit ➔</a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer', { storageMode: storageMode }) %>

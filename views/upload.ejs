@@ -1,0 +1,163 @@
+<%- include('partials/header', { title: 'Upload Assignment', activePage: 'upload', storageMode: storageMode, s3Bucket: s3Bucket, success: success, error: error }) %>
+
+<!-- Page Title -->
+<div class="page-header" style="text-align: center; max-width: 700px; margin: 0 auto 2rem;">
+  <h1 class="page-title">Submit Course Assignment</h1>
+  <p class="page-subtitle">
+    Upload your completed coursework. Files are securely validated and stored in 
+    <strong><%= storageMode === 's3' ? 'Amazon S3 private cloud storage' : 'the local secure repository' %></strong>.
+  </p>
+</div>
+
+<!-- Upload Form Card -->
+<div class="card form-card">
+
+  <!-- Storage Destination Notice -->
+  <div style="background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.9rem 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span style="font-size: 1.2rem;"><%= storageMode === 's3' ? '☁️' : '💾' %></span>
+      <span>
+        <strong>Destination:</strong> 
+        <%= storageMode === 's3' ? 'Amazon S3 Bucket (' + s3Bucket + ')' : 'Local File Storage (uploads/)' %>
+      </span>
+    </div>
+    <span class="badge <%= storageMode === 's3' ? 'badge-s3' : 'badge-local' %>">
+      <%= storageMode.toUpperCase() %>
+    </span>
+  </div>
+
+  <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+    
+    <!-- Student Name -->
+    <div class="form-group">
+      <label for="studentName" class="form-label">
+        Student Full Name <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="studentName" 
+        name="studentName" 
+        class="form-input" 
+        placeholder="e.g. Rahul Sharma" 
+        required 
+        maxlength="100"
+      >
+      <div class="form-help">Enter your official name as registered in the university roll list.</div>
+    </div>
+
+    <!-- Roll Number -->
+    <div class="form-group">
+      <label for="rollNumber" class="form-label">
+        University Roll Number <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="rollNumber" 
+        name="rollNumber" 
+        class="form-input" 
+        placeholder="e.g. 2026CS101" 
+        required 
+        maxlength="30"
+      >
+      <div class="form-help">Enter your student ID or roll number for grading correlation.</div>
+    </div>
+
+    <!-- Subject Dropdown -->
+    <div class="form-group">
+      <label for="subjectSelect" class="form-label">
+        Subject <span class="required">*</span>
+      </label>
+      <select id="subjectSelect" name="subject" class="form-select" required>
+        <option value="">-- Select Enrolled Subject --</option>
+        <% subjects.forEach(function(sub) { %>
+          <option value="<%= sub %>" <%= (selectedSubject === sub) ? 'selected' : '' %>>
+            <%= sub %>
+          </option>
+        <% }); %>
+      </select>
+    </div>
+
+    <!-- Assignment Title Dropdown / Text -->
+    <div class="form-group">
+      <label for="assignmentTitleSelect" class="form-label">
+        Assignment Title <span class="required">*</span>
+      </label>
+      <select id="assignmentTitleSelect" name="assignmentTitle" class="form-select" required>
+        <option value="">-- Select Assignment Title --</option>
+        <% assignments.forEach(function(asg) { %>
+          <option 
+            value="<%= asg.title %>" 
+            data-subject="<%= asg.subject %>"
+            <%= (selectedAssignmentTitle === asg.title) ? 'selected' : '' %>
+          >
+            [<%= asg.subject %>] <%= asg.title %>
+          </option>
+        <% }); %>
+      </select>
+      <div class="form-help">Select the coursework title corresponding to this submission.</div>
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="form-group">
+      <label class="form-label">
+        Assignment File <span class="required">*</span>
+      </label>
+
+      <!-- Drag and Drop Box -->
+      <div class="drop-zone" id="dropZone">
+        <input 
+          type="file" 
+          id="fileInput" 
+          name="assignmentFile" 
+          class="file-input-hidden" 
+          accept=".pdf,.doc,.docx,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip"
+          required
+        >
+        <div class="drop-zone-icon">📄</div>
+        <div class="drop-zone-prompt">
+          <span>Click to browse</span> or drag and drop your assignment file here
+        </div>
+        <div class="drop-zone-limits">
+          Allowed formats: <strong>PDF, DOC, DOCX, ZIP</strong> (Maximum size: <strong>5 MB</strong>)
+        </div>
+      </div>
+
+      <!-- Live File Selection Preview -->
+      <div class="file-preview" id="filePreview" style="display: none;">
+        <div class="file-preview-info">
+          <span>📎</span>
+          <span class="file-preview-name" id="fileNameDisplay">file.pdf</span>
+          <span class="file-preview-size" id="fileSizeDisplay">(0 KB)</span>
+        </div>
+        <span class="badge badge-active">Ready for submission</span>
+      </div>
+
+      <div class="form-help" style="margin-top: 0.5rem;">
+        🔒 <strong>Security Policy:</strong> Executable files (.exe, .bat, .sh, .cmd, etc.) are strictly blocked via magic byte signature verification.
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="margin-top: 2rem;">
+      <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
+        <span>📤</span> Submit Assignment
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- Helpful Instructions Card -->
+<div style="max-width: 700px; margin: 1.5rem auto 0; background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.25rem;">
+  <h3 style="font-size: 0.95rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">
+    💡 Submission Guidelines
+  </h3>
+  <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1.25rem; line-height: 1.6;">
+    <li>Ensure your code files or report documents are organized before uploading.</li>
+    <li>For multi-file coding projects (e.g. DBMS SQL scripts, Java/Python code), archive them inside a <code>.zip</code> file.</li>
+    <li>File uploads are constrained to <strong>5 MB</strong>. Optimize any high-resolution images within PDFs.</li>
+    <li>Once uploaded, you can view your submission and verify download links on the <strong>Files</strong> page.</li>
+  </ul>
+</div>
+
+<%- include('partials/footer', { storageMode: storageMode }) %>

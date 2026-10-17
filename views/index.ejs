@@ -1,0 +1,190 @@
+<%- include('partials/header', { title: 'Dashboard', activePage: 'home', storageMode: storageMode, s3Bucket: s3Bucket, success: success, error: error }) %>
+
+<!-- Hero Banner -->
+<section class="hero-banner">
+  <div class="hero-content">
+    <div class="hero-tag">☁️ Cloud-Powered Academic Portal</div>
+    <h1 class="hero-title">Welcome to Cloud Assignment Manager</h1>
+    <p class="hero-desc">
+      A centralized web platform for students to browse course assignments, submit academic coursework securely, and retrieve graded files. Configured for local offline development or automated cloud storage with Amazon S3 and AWS EC2.
+    </p>
+    <div class="hero-actions">
+      <a href="/upload" class="btn btn-white">
+        <span>📤</span> Submit Assignment
+      </a>
+      <a href="/assignments" class="btn btn-outline-white">
+        <span>📚</span> Browse Assignments
+      </a>
+      <a href="/files" class="btn btn-outline-white">
+        <span>📁</span> View Submissions (<%= totalFiles %>)
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Dashboard Metric Cards -->
+<section class="stats-grid">
+  <!-- Total Assignments Card -->
+  <div class="card stat-card">
+    <div class="stat-icon-box stat-icon-blue">
+      📚
+    </div>
+    <div class="stat-details">
+      <span class="stat-value"><%= totalAssignments %></span>
+      <span class="stat-label">Total Course Assignments</span>
+    </div>
+  </div>
+
+  <!-- Submitted Files Card -->
+  <div class="card stat-card">
+    <div class="stat-icon-box stat-icon-green">
+      📁
+    </div>
+    <div class="stat-details">
+      <span class="stat-value"><%= totalFiles %></span>
+      <span class="stat-label">Submitted Student Files</span>
+    </div>
+  </div>
+
+  <!-- Active Subjects Card -->
+  <div class="card stat-card">
+    <div class="stat-icon-box stat-icon-sky">
+      🎓
+    </div>
+    <div class="stat-details">
+      <span class="stat-value"><%= totalSubjects %></span>
+      <span class="stat-label">Registered Subjects</span>
+    </div>
+  </div>
+
+  <!-- Cloud Storage Mode Card -->
+  <div class="card stat-card">
+    <div class="stat-icon-box stat-icon-amber">
+      ☁️
+    </div>
+    <div class="stat-details">
+      <span class="stat-value" style="font-size: 1.25rem;">
+        <%= storageMode.toUpperCase() %>
+      </span>
+      <span class="stat-label">
+        <% if (storageMode === 's3') { %>
+          Bucket: <%= s3Bucket %>
+        <% } else { %>
+          Target: local uploads/
+        <% } %>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- Two-Column Overview Layout -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+  
+  <!-- Recent Submissions Widget -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a;">Recent Submissions</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Latest uploaded files by enrolled students</p>
+      </div>
+      <a href="/files" class="btn btn-secondary btn-sm">View All Files →</a>
+    </div>
+
+    <% if (recentFiles.length === 0) { %>
+      <div class="empty-state" style="padding: 2rem 1rem;">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No Submissions Yet</div>
+        <p class="empty-desc">Students haven't uploaded any assignments yet. Be the first to submit!</p>
+        <a href="/upload" class="btn btn-primary btn-sm">Submit Assignment Now</a>
+      </div>
+    <% } else { %>
+      <div class="table-container" style="border: none; box-shadow: none;">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Subject</th>
+              <th>File</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentFiles.forEach(function(file) { %>
+              <tr>
+                <td>
+                  <strong><%= file.studentName %></strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);"><%= file.rollNumber %></div>
+                </td>
+                <td>
+                  <span class="badge badge-subject"><%= file.subject %></span>
+                </td>
+                <td>
+                  <span style="font-size: 0.85rem; font-weight: 500;" title="<%= file.originalFilename %>">
+                    <%= file.originalFilename.length > 20 ? file.originalFilename.substring(0, 18) + '...' : file.originalFilename %>
+                  </span>
+                </td>
+                <td>
+                  <a href="/files/download/<%= file.id %>" class="btn btn-download btn-sm" title="Download <%= file.originalFilename %>">
+                    ⬇️ Download
+                  </a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Featured Active Assignments Widget -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a;">Active Assignments</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Current coursework open for submission</p>
+      </div>
+      <a href="/assignments" class="btn btn-secondary btn-sm">All Assignments →</a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+      <% activeAssignments.slice(0, 3).forEach(function(asg) { %>
+        <div style="border: 1px solid var(--border-light); padding: 0.9rem; border-radius: var(--radius-md); background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+          <div style="max-width: 70%;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span class="badge badge-subject" style="font-size: 0.75rem;"><%= asg.subject %></span>
+              <span class="badge badge-active">Due <%= asg.dueDate %></span>
+            </div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: #1e3a8a;"><%= asg.title %></div>
+          </div>
+          <div>
+            <a href="/upload?subject=<%= encodeURIComponent(asg.subject) %>&assignmentTitle=<%= encodeURIComponent(asg.title) %>" class="btn btn-primary btn-sm">
+              Submit →
+            </a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+</div>
+
+<!-- Architecture & System Highlights -->
+<div class="card" style="margin-top: 1.5rem; background: linear-gradient(to right, #ffffff, #f0fdf4);">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.25rem;">
+        🛡️ Cloud Computing Ready Architecture
+      </h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted);">
+        Supports instant offline operation with local filesystem, or instant cloud scalability with Amazon S3 private storage & presigned URLs.
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+      <span class="badge badge-subject">MIME & Magic Bytes Verified</span>
+      <span class="badge badge-subject">Directory Traversal Proof</span>
+      <span class="badge badge-subject">Max File Size: 5MB</span>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer', { storageMode: storageMode }) %>
